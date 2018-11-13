@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gophercises/urlshort"
+	"github.com/shirleyleu/urlshort"
 )
 
 func main() {
@@ -29,8 +29,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	fmt.Println("Starting the server on :8080")
 	http.ListenAndServe(":8080", yamlHandler)
+	//http.ListenAndServe(":8080", mapHandler)
+
 }
 
 func defaultMux() *http.ServeMux {
