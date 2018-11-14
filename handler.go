@@ -27,11 +27,6 @@ func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 // URL. If the path is not provided in the YAML, then the
 // fallback http.Handler will be called instead.
 //
-// YAML is expected to be in the format:
-//
-//     - path: /some-path
-//       url: https://www.some-url.com/demo
-//
 // The only errors that can be returned all related to having
 // invalid YAML data.
 //
@@ -39,14 +34,30 @@ func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.Handl
 // a mapping of paths to urls.
 
 func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
-	var parsed []map[string]string
-	err := yaml.Unmarshal(yml, &parsed)
-	if err != nil {
+	p, err := parseYAML(yml)
+	if err !=nil {
 		return nil, err
 	}
-	parsedMap := make(map[string]string)
-	for _, v := range parsed {
-		parsedMap[v["path"]] = v["url"]
+	m := buildMap(p)
+	return MapHandler(m, fallback), nil
+}
+
+// YAML is expected to be in the format:
+//
+//     - path: /some-path
+//       url: https://www.some-url.com/demo
+func parseYAML(yml []byte) ([]map[string]string, error){
+	var parsed []map[string]string
+	if err := yaml.Unmarshal(yml, &parsed); err != nil {
+		return nil, err
 	}
-	return MapHandler(parsedMap, fallback), nil
+	return parsed, nil
+	}
+
+func buildMap(p []map[string]string) map[string]string{
+	m := make(map[string]string)
+	for _, v := range p {
+		m[v["path"]] = v["url"]
+	}
+	return m
 }
