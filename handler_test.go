@@ -9,7 +9,7 @@ func Test_parseYAML(t *testing.T) {
 	tests := []struct {
 		name    string
 		yml    []byte
-		want    []map[string]string
+		want    []pathURL
 		wantErr bool
 	}{
 		{
@@ -18,7 +18,7 @@ func Test_parseYAML(t *testing.T) {
   url: https://github.com/gophercises/urlshort
 - path: /urlshort-final
   url: https://github.com/gophercises/urlshort/tree/solution`),
-			want:[]map[string]string{{"path":"/urlshort", "url":"https://github.com/gophercises/urlshort"},{"path":"/urlshort-final", "url":"https://github.com/gophercises/urlshort/tree/solution"}},
+			want:[]pathURL{{Path: "/urlshort", URL:"https://github.com/gophercises/urlshort"},{Path: "/urlshort-final", URL:"https://github.com/gophercises/urlshort/tree/solution"}},
 			wantErr: false,
 		},
 		{

@@ -13,8 +13,8 @@ import (
 // http.Handler will be called instead.
 func MapHandler(pathsToUrls map[string]string, fallback http.Handler) http.HandlerFunc {
 	h := func(w http.ResponseWriter, r *http.Request) {
-		if url, ok := pathsToUrls[r.URL.Path]; ok {
-			http.Redirect(w,r,url, http.StatusFound)
+		if dest, ok := pathsToUrls[r.URL.Path]; ok {
+			http.Redirect(w, r, dest, http.StatusFound)
 		} else {
 			fallback.ServeHTTP(w,r)
 		}
@@ -46,18 +46,23 @@ func YAMLHandler(yml []byte, fallback http.Handler) (http.HandlerFunc, error) {
 //
 //     - path: /some-path
 //       url: https://www.some-url.com/demo
-func parseYAML(yml []byte) ([]map[string]string, error){
-	var parsed []map[string]string
-	if err := yaml.Unmarshal(yml, &parsed); err != nil {
+type pathURL struct{
+	Path string `yaml:"path"`
+	URL string `yaml:"url"`
+}
+
+func parseYAML(yml []byte) ([]pathURL, error){
+	var p []pathURL
+	if err := yaml.Unmarshal(yml, &p); err != nil {
 		return nil, err
 	}
-	return parsed, nil
-	}
+	return p, nil
+}
 
-func buildMap(p []map[string]string) map[string]string{
+func buildMap(p []pathURL) map[string]string{
 	m := make(map[string]string)
 	for _, v := range p {
-		m[v["path"]] = v["url"]
+		m[v.Path] = v.URL
 	}
 	return m
 }
